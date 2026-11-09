@@ -1,0 +1,13 @@
+Practica 2 - verificacion reproducible
+Fecha: 2026-11-09T18:00:36.819256-05:00[America/Bogota]
+Java: 27
+VM: OpenJDK 64-Bit Server VM
+SO: Mac OS X / aarch64
+Procesadores disponibles: 10
+Paralelismo commonPool: 9
+
+co.edu.unal.paralela.StudentAnalyticsTest: 6 pruebas, 0 fallos, 0 ignoradas; 819 ms
+
+co.edu.unal.paralela.StudentAnalyticsEdgeTest: 15 pruebas, 0 fallos, 0 ignoradas; 61 ms
+
+RESULTADO: OK

@@ -1,0 +1,7 @@
+verificacion/build/
+verificacion/.build.*/
+tmp/
+ejercicio_2/target/
+__pycache__/
+.DS_Store
+*.class

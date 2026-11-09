@@ -1,0 +1,44 @@
+Practica 2 - verificacion reproducible
+Fecha: 2026-11-09T17:59:54.200933-05:00[America/Bogota]
+Java: 27
+VM: OpenJDK 64-Bit Server VM
+SO: Mac OS X / aarch64
+Procesadores disponibles: 10
+Paralelismo commonPool: 9
+
+co.edu.unal.paralela.StudentAnalyticsTest: 6 pruebas, 1 fallos, 0 ignoradas; 1112 ms
+junit.framework.AssertionFailedError: Expected speedup to be at least 5.0 but was 4.612244897959184
+	at junit.framework.Assert.fail(Assert.java:57)
+	at junit.framework.Assert.assertTrue(Assert.java:22)
+	at junit.framework.TestCase.assertTrue(TestCase.java:192)
+	at co.edu.unal.paralela.StudentAnalyticsTest.testMostCommonFirstNameOfInactiveStudentsPerf(StudentAnalyticsTest.java:118)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:583)
+	at junit.framework.TestCase.runTest(TestCase.java:176)
+	at junit.framework.TestCase.runBare(TestCase.java:141)
+	at junit.framework.TestResult$1.protect(TestResult.java:122)
+	at junit.framework.TestResult.runProtected(TestResult.java:142)
+	at junit.framework.TestResult.run(TestResult.java:125)
+	at junit.framework.TestCase.run(TestCase.java:129)
+	at junit.framework.TestSuite.runTest(TestSuite.java:252)
+	at junit.framework.TestSuite.run(TestSuite.java:247)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runners.Suite.runChild(Suite.java:128)
+	at org.junit.runners.Suite.runChild(Suite.java:27)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:105)
+	at org.junit.runner.JUnitCore.runClasses(JUnitCore.java:62)
+	at org.junit.runner.JUnitCore.runClasses(JUnitCore.java:49)
+	at RunTests.main(RunTests.java:19)
+
+
+co.edu.unal.paralela.StudentAnalyticsEdgeTest: 15 pruebas, 0 fallos, 0 ignoradas; 74 ms
+
+RESULTADO: FALLO
