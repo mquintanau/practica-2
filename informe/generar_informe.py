@@ -199,6 +199,7 @@ bullet('Páginas 2 a 6: conceptos, implementación real y justificación de las 
 bullet('Página 7: un conjunto de estudiantes resuelto a mano, de principio a fin.')
 bullet('Páginas 8 y 9: complejidad, rendimiento y evidencia de verificación.')
 bullet('Páginas 10 a 12: preguntas con respuestas, ejercicios y fuentes primarias.')
+bullet('Páginas 13 a 16: composición de los tests, aserciones y criterios de aprobación.')
 heading('Archivos que debes reconocer')
 para('`ejercicio_2/src/main/java/co/edu/unal/paralela/StudentAnalytics.java` contiene la '
      'solución. `verificacion/` contiene pruebas adicionales y el registro de ejecución. '
@@ -553,6 +554,139 @@ for num, label, url in refs:
     markdown.append(f'[{num}] [{label}]({url})\n')
 
 
+page('13 / Tests: estructura', 'Anatomía de una prueba',
+     'Dos suites, 21 métodos de prueba y varias comprobaciones dentro de cada método.')
+table(['Componente', 'Responsabilidad'], [
+    ['StudentAnalyticsTest', '6 pruebas originales: 3 de corrección y 3 de rendimiento.'],
+    ['StudentAnalyticsEdgeTest', '15 pruebas adicionales: casos pequeños, fronteras y '
+     'comparación de 200 arreglos dentro de un solo test.'],
+    ['RunTests', 'Ejecuta ambas suites con JUnitCore, reúne resultados y decide el estado global.'],
+    ['verificar.sh', 'Compila con javac, ejecuta el runner, guarda la salida y limpia '
+     'las clases temporales. Usa los JAR incluidos.'],
+], [154, W - 154])
+heading('Cómo se descubre y ejecuta cada test')
+para('Las dos clases heredan de TestCase y usan métodos públicos void, sin '
+     'parámetros, cuyo nombre empieza por test. Es el estilo de JUnit 3, '
+     'compatible con el runner de JUnit 4.12 incluido. No necesitan @Test. '
+     'Los helpers generan datos o comparten lógica, pero no cuentan como tests.')
+heading('Preparar, ejecutar y comprobar')
+para('Por ejemplo, la frontera de nota crea tres estudiantes inactivos de 21 años '
+     'con notas 64, 65 y 66. Invoca el conteo paralelo y exige 1: solo 64 es '
+     'menor que 65. Si la implementación usara <= 65, devolvería 2 y fallaría.')
+table(['Aserción', 'Condición para cumplirla'], [
+    ['assertEquals', 'Igualdad de enteros o nombres; para double se indica una tolerancia.'],
+    ['assertTrue', 'La condición debe ser verdadera: un umbral, una moda válida o isNaN.'],
+    ['assertNull', 'Se exige null cuando no hay nombre que devolver.'],
+    ['assertSame', 'Se exige la misma referencia en cada posición del arreglo.'],
+], [128, W - 128])
+para('Un test aprueba si termina sin aserciones fallidas ni excepciones no controladas. '
+     'Si una aserción falla, se interrumpe ese test y no se ejecutan sus comprobaciones '
+     'restantes. JUnit recoge el problema y continúa con las demás pruebas.')
+para('Los nombres completos de todos los tests, sus entradas y sus resultados '
+     'esperados están documentados en `informe/tests.md`.', small=True)
+
+page('14 / Tests originales', 'Seis tests y sus umbrales',
+     'Las pruebas funcionales comparan resultados; las de rendimiento añaden una exigencia temporal.')
+heading('Datos generados por cada helper')
+para('Se crea un arreglo de 2.000.000 estudiantes con Random(123). Los primeros '
+     '600.000 son activos y los otros 1.400.000 son inactivos. Se elige entre '
+     'seis nombres y seis apellidos. Las edades están en [0, 100) y las notas '
+     'son enteros entre 1 y 100, inclusive. Cada helper genera un arreglo nuevo.')
+table(['Consulta', 'Test de corrección', 'Test terminado en Perf'], [
+    ['Promedio', 'Error absoluto frente al imperativo < 1E-5.',
+     'La misma comprobación y S > 1,2.'],
+    ['Moda', 'Nombre exactamente igual al imperativo para el conjunto generado.',
+     'La misma comprobación y S >= 0,5 × p.'],
+    ['Conteo', 'Entero exactamente igual al imperativo.',
+     'La misma comprobación y S > 1,2.'],
+], [79, 198, W - 277])
+heading('Qué hace el helper compartido')
+bullet('Calcula una referencia con el método imperativo, antes de cronometrar.')
+bullet('Mide un bloque de llamadas imperativas con currentTimeMillis.')
+bullet('Ejecuta una llamada paralela y comprueba su resultado con aserciones.')
+bullet('Mide un bloque de llamadas paralelas y devuelve S = T_secuencial / T_paralelo.')
+para('Los tests de corrección pasan 1 repetición por bloque y no exigen un speedup. '
+     'Los Perf pasan 10 repeticiones y sí comprueban el cociente. Los bloques '
+     'comparan igual cantidad de llamadas; la generación de datos queda fuera '
+     'de esos cronómetros.')
+heading('Ejemplos de aprobación: tiempos ilustrativos')
+table(['T secuencial', 'T paralelo', 'S', 'Decisión'], [
+    ['120 ms', '100 ms', '1,2', 'No aprueba promedio/conteo: la desigualdad es estricta.'],
+    ['121 ms', '100 ms', '1,21', 'Sí cumple el umbral de promedio/conteo.'],
+    ['500 ms', '100 ms', '5', 'Sí cumple moda con p = 10; se admite igualdad.'],
+], [86, 77, 44, W - 207])
+para('p es availableProcessors(): procesadores visibles para la JVM, no '
+     'necesariamente núcleos físicos. Aprobar Perf también requiere el resultado '
+     'correcto: una aceleración alta por sí sola no es suficiente.', small=True)
+
+page('15 / Tests adicionales', 'Quince casos de comprobación',
+     'Las expectativas pequeñas se calculan a mano; una prueba amplía la cobertura con datos aleatorios.')
+table(['Caso', 'Condición para aprobar'], [
+    ['1. Arreglo vacío', 'Promedio NaN, nombre null y conteo 0.'],
+    ['2. Todos activos', 'Edades 18 y 24: promedio 21, nombre null y conteo 0.'],
+    ['3. Todos inactivos', 'Dos Ana de 22 y 24, notas 64 y 50: NaN, Ana y 2.'],
+    ['4. Edades fraccionarias', 'Activos 18,5 y 21,25: promedio 19,875, tolerancia '
+     '1E-12; el inactivo de 90 no participa.'],
+    ['5. Frontera de edad', '19,99; 20; 20,0001, inactivos con nota 64: conteo 1.'],
+    ['6. Frontera de nota', '21 años, inactivos, notas 64, 65 y 66: conteo 1.'],
+    ['7. Activo con nota baja', 'Dos de 25 años y nota 10, uno activo: conteo 1.'],
+    ['8. Moda solo de inactivos', 'Tres Ana activos; dos Eva y un Luis inactivos: Eva.'],
+    ['9. Mayúsculas', 'Un Ana y dos ana inactivos: resultado ana.'],
+    ['10. Empate y colisión', 'FB y Ea tienen frecuencia 2 y el mismo hash; '
+     'Otro, 1. Se acepta FB o Ea como ganador.'],
+    ['11. Fuente intacta', 'Tras las tres consultas se conservan las referencias '
+     'y el orden del arreglo, comprobados con assertSame.'],
+    ['12. Un activo', 'Ana activa, 20,5 años y nota 64: 20,5, null y 0.'],
+    ['13. Un inactivo', 'Ana inactiva, 20,5 años y nota 64: NaN, Ana y 1.'],
+    ['14. Llamadas repetidas', 'Alternar dos arreglos 12 veces mantiene sus modas '
+     'Ana/null y conteos 1/0 sin acumular estado.'],
+    ['15. Equivalencia aleatoria', '200 arreglos con semilla 20261109; '
+     'longitudes 0 a 3000; edades [0, 100); notas 0 a 100.'],
+], [149, W - 149])
+para('En el caso aleatorio: promedio igual al imperativo con tolerancia 1E-9 '
+     'o NaN; conteo exactamente igual. Para la moda se cuentan inactivos '
+     'en un mapa secuencial independiente: el ganador debe tener frecuencia '
+     'máxima; si es único, también debe coincidir con el imperativo. '
+     'Doscientos arreglos forman un test, no doscientos tests.', small=True)
+
+page('16 / Aprobación y diagnóstico', 'Cómo leer el resultado',
+     'La salida distingue una discrepancia de cálculo, un fallo temporal y un problema de ejecución.')
+heading('El comando y su resultado global')
+code('bash verificacion/verificar.sh')
+para('El script crea una carpeta temporal, compila las clases de aplicación, '
+     'pruebas y runner, y ejecuta RunTests. La salida se muestra y se guarda '
+     'en `verificacion/resultados.txt`. Al terminar, se borran las clases temporales.')
+para('RunTests suma getFailureCount() de ambas suites. Con 0 fallos imprime '
+     'RESULTADO: OK y finaliza con código 0. Con uno o más fallos imprime '
+     'las trazas, RESULTADO: FALLO y sale con código 1. La opción pipefail '
+     'evita que tee oculte el error del proceso que ejecuta las pruebas.')
+table(['Qué revisar', 'Evidencia de la ejecución publicada'], [
+    ['Suite original', '6 pruebas, 0 fallos, 0 ignoradas; 819 ms.'],
+    ['Suite adicional', '15 pruebas, 0 fallos, 0 ignoradas; 61 ms.'],
+    ['Estado global', 'RESULTADO: OK. Registro del 09.11.2026 sobre Java 27.'],
+], [126, W - 126])
+para('El runner no impone una aserción separada de exactamente 21 pruebas '
+     'o cero ignoradas; decide por los fallos. Para confirmar la cobertura '
+     'prevista, revisa también 6 + 15 y cero ignoradas. Los milisegundos '
+     'del resumen son de suites completas, no de métodos individuales.', small=True)
+heading('Interpretar un fallo')
+table(['Señal', 'Interpretación'], [
+    ['Valor o error numérico', 'Revisar selección de estudiantes, cálculo y tolerancia.'],
+    ['Expected speedup...', 'El helper ya aprobó el valor, pero no alcanzó el umbral temporal.'],
+    ['Excepción o error javac', 'La prueba no terminó normalmente; revisar la traza o compilación.'],
+], [145, W - 145])
+heading('Qué demuestra aprobar y qué requiere revisión')
+para('El registro demuestra aprobación para los casos y el entorno ejecutados. '
+     'No prueba una aceleración universal ni corrección para toda entrada. '
+     'El uso de streams paralelos, la ausencia de ciclos y el aislamiento '
+     'de los acumuladores también se revisan en el código.')
+para('Los umbrales temporales pueden variar por JIT, recolección de basura '
+     'y carga del equipo. El reloj de milisegundos puede medir intervalos '
+     'de cero, sin protección explícita del cociente en los helpers. No '
+     'se cambiaron los tests originales ni se presenta una ejecución '
+     'temporal como garantía de rendimiento.', small=True)
+
+
 def decorate(canvas, doc):
     canvas.saveState()
     width, height = doc.pagesize
@@ -577,6 +711,8 @@ doc = SimpleDocTemplate(str(target), pagesize=(595.28, 841.89),
                         subject='Solución, teoría y preguntas de sustentación',
                         pageCompression=1)
 doc.build(story, onFirstPage=decorate, onLaterPages=decorate)
+# Mantiene sincronizada la copia situada en la raíz del repositorio.
+(ROOT / target.name).write_bytes(target.read_bytes())
 (ROOT / 'informe' / 'guia_estudio.md').write_text('\n'.join(markdown), encoding='utf-8')
 print(f'PDF generado: {target}')
 print(f'Páginas previstas: {page_count}')

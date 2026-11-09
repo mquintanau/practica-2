@@ -15,6 +15,10 @@ Los métodos paralelos no usan ciclos explícitos.
 
 ## Verificación
 
+Consulta la [explicación completa de los tests](informe/tests.md): estructura de las suites,
+datos de entrada, aserciones, condiciones para aprobar cada una de las 21 pruebas,
+cálculo del speedup e interpretación de los fallos.
+
 Desde esta carpeta:
 
 ```bash
