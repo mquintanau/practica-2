@@ -1,6 +1,11 @@
 # Cómo se componen y aprueban los tests
 
-La práctica tiene **21 tests** organizados en dos suites: **6 originales** y **15 adicionales**.
+**Estado actual: solo están activas las 6 pruebas originales.** La suite adicional está
+comentada en `RunTests.java` y excluida de la compilación de `verificar.sh`.
+Sus 15 pruebas se conservan. Las secciones que las describen y los resultados de 21 pruebas
+corresponden a la configuración completa anterior, también documentada en el PDF.
+
+La práctica conserva **21 tests** organizados en dos suites: **6 originales** y **15 adicionales**.
 Una suite es una clase que agrupa métodos de prueba. Un test puede contener varias aserciones
 y recorrer muchos conjuntos de datos: los 200 arreglos de la comparación aleatoria pertenecen
 a **un solo test**, no a 200 tests independientes.
@@ -11,7 +16,7 @@ a **un solo test**, no a 200 tests independientes.
 | --- | --- |
 | [`StudentAnalyticsTest.java`](../ejercicio_2/src/test/java/co/edu/unal/paralela/StudentAnalyticsTest.java) | Pruebas originales de corrección y rendimiento, sin modificaciones. |
 | [`StudentAnalyticsEdgeTest.java`](../verificacion/StudentAnalyticsEdgeTest.java) | Casos pequeños, fronteras, empates y comparación aleatoria. |
-| [`RunTests.java`](../verificacion/RunTests.java) | Ejecuta las dos suites mediante JUnitCore y reúne los resultados. |
+| [`RunTests.java`](../verificacion/RunTests.java) | Actualmente ejecuta solo la suite original mediante JUnitCore. La adicional está comentada. |
 | [`verificar.sh`](../verificacion/verificar.sh) | Compila, ejecuta el runner, guarda la salida y elimina las clases temporales. |
 | [`resultados.txt`](../verificacion/resultados.txt) | Evidencia de una ejecución: entorno, cantidad de pruebas, fallos y resultado global. |
 
@@ -22,7 +27,7 @@ verificar.sh
   -> javac: compilar aplicación, pruebas y runner
   -> java: ejecutar RunTests
        -> JUnitCore: StudentAnalyticsTest       (6 tests)
-       -> JUnitCore: StudentAnalyticsEdgeTest   (15 tests)
+       # StudentAnalyticsEdgeTest desactivada (15 tests conservados)
   -> tee: mostrar y guardar el resultado
 ```
 
@@ -173,8 +178,8 @@ El script requiere un JDK 8 o posterior. Usa los JAR locales de JUnit y Hamcrest
 dependencias. Crea una carpeta temporal, compila las clases y ejecuta `RunTests` con `-Xmx4g`.
 La opción configura un máximo de heap; no significa que siempre se consuman 4 GB.
 
-`RunTests` ejecuta cada suite y consulta su cantidad de pruebas, fallos e ignoradas.
-Acumula `getFailureCount()` de ambas suites:
+`RunTests` ejecuta las suites activas y consulta su cantidad de pruebas, fallos e ignoradas.
+Actualmente solo está activa `StudentAnalyticsTest`; suma `getFailureCount()` de las suites ejecutadas:
 
 - Si el total de fallos es **0**, imprime `RESULTADO: OK` y termina normalmente, con código **0**.
 - Si hay **uno o más fallos**, imprime sus trazas, muestra `RESULTADO: FALLO`
@@ -188,13 +193,16 @@ Para comprobar que se ejecutó **toda la cobertura prevista**, hay que leer los 
 
 ```text
 StudentAnalyticsTest: 6 pruebas, 0 fallos, 0 ignoradas
-StudentAnalyticsEdgeTest: 15 pruebas, 0 fallos, 0 ignoradas
 RESULTADO: OK
 ```
 
 Ese fragmento es un resumen del formato; el archivo real incluye paquetes, entorno y tiempos.
 El runner decide `OK` por el número de fallos: **no tiene una aserción adicional que exija
-exactamente 21 pruebas o cero ignoradas**. Por eso conviene revisar también los contadores.
+exactamente 6 pruebas o cero ignoradas**. Por eso conviene revisar también los contadores.
+
+Para reactivar la suite adicional más adelante, se debe descomentar su nombre en
+`RunTests.java` y volver a incluir `StudentAnalyticsEdgeTest.java` en la compilación
+de `verificar.sh`. La configuración completa ejecuta 6 + 15 pruebas.
 
 ## 6. Qué significa el resultado publicado y cómo leer un fallo
 

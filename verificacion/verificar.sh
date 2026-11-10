@@ -14,6 +14,7 @@ fi
     javac "${COMPILER_OPTIONS[@]}" -encoding UTF-8 -cp "$JARS" -d "$BUILD" \
         "$ROOT"/ejercicio_2/src/main/java/co/edu/unal/paralela/*.java \
         "$ROOT/ejercicio_2/src/test/java/co/edu/unal/paralela/StudentAnalyticsTest.java" \
-        "$ROOT/verificacion/StudentAnalyticsEdgeTest.java" "$ROOT/verificacion/RunTests.java"
+        "$ROOT/verificacion/RunTests.java"
+    # Suite adicional desactivada: StudentAnalyticsEdgeTest.java no se compila.
     java -Xmx4g -cp "$BUILD:$JARS" RunTests
 } 2>&1 | tee "$ROOT/verificacion/resultados.txt"

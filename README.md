@@ -15,6 +15,11 @@ Los métodos paralelos no usan ciclos explícitos.
 
 ## Verificación
 
+**Por ahora se ejecutan únicamente las 6 pruebas originales.** La inscripción de
+`StudentAnalyticsEdgeTest` está comentada en `verificacion/RunTests.java` y el script
+no compila esa suite. Sus 15 pruebas se conservan para poder reactivarlas después.
+El PDF y la explicación de las pruebas adicionales documentan la suite completa anterior.
+
 Consulta la [explicación completa de los tests](informe/tests.md): estructura de las suites,
 datos de entrada, aserciones, condiciones para aprobar cada una de las 21 pruebas,
 cálculo del speedup e interpretación de los fallos.
@@ -30,7 +35,7 @@ Compila con API Java 8 (`--release 8` en JDK posteriores; `-source/-target 1.8` 
 ejecuta JUnit y elimina las clases temporales. Devuelve un código de error si alguna prueba falla.
 El registro más reciente se guarda en [resultados.txt](verificacion/resultados.txt).
 
-La ejecución final documentada pasó **21 pruebas**: las 6 originales (3 de corrección y 3 de
+Una ejecución anterior documentada pasó **21 pruebas**: las 6 originales (3 de corrección y 3 de
 rendimiento) y 15 adicionales. Entre las adicionales hay una comparación con 200 arreglos
 pseudoaleatorios, además de fronteras de edad y nota, vacío, empates e integridad de la fuente.
 Se ejecutó en OpenJDK 27/macOS aarch64, con 10 procesadores visibles y commonPool de paralelismo 9.
